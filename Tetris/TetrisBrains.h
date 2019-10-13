@@ -17,3 +17,11 @@ int MoveFig(HDC hdc, int* Grid, FigInfo* figInfo, WPARAM wParam);
 
 int CheckLeft(int* Grid, FigInfo* figInfo);
 int CheckRight(int* Grid, FigInfo* figInfo); 
+int Flip(FigInfo* figInfo);
+template <typename T>
+constexpr T POWERTWO(T t)  {
+	return (static_cast<T>(1) << t);
+}
+
+#define FULL_LINE POWERTWO(GRID_WIDTH)-1
+#define RIGHT_BORDER POWERTWO(GRID_WIDTH-1)

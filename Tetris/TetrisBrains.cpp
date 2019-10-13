@@ -2,6 +2,7 @@
 #include "Tetris.h"
 #include <Windows.h>
 
+
 int DrawGrid(HDC hdc, int* piGrid) {
 	int pow = 1;
 	for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -152,7 +153,9 @@ int MoveFig(HDC hdc, int* Grid, FigInfo* figInfo, WPARAM wParam) {
 }
 
 int CheckLines(HDC hdc, int* piGrid) {
-	static const int FULL_LINE = (1 << GRID_WIDTH) - 1;
+	
+	//static const int FULL_LINE = (1 << GRID_WIDTH) - 1;
+
 	for (int i = 0; i < GRID_HEIGHT; i++) {
 		if (piGrid[i] == FULL_LINE) {
 			piGrid[i] = -1;
@@ -190,15 +193,40 @@ int CheckLeft(int* Grid, FigInfo* figInfo) {
 //TODO: Generalize with checkLeft
 int CheckRight(int* Grid, FigInfo* figInfo) {
 
-	static const int rightBorder = 1 << (GRID_WIDTH - 1);
+	//static const int rightBorder = 1 << (GRID_WIDTH - 1);
 	int result = 0;
 	for (int i = 0; i < FIG_SIZE; i++) {
 		int currFigLine = figInfo->fig[i];
 		int currGridLine = Grid[i + (figInfo->x)] & ~currFigLine;
-		result |= rightBorder & currFigLine;
+		result |= RIGHT_BORDER & currFigLine;
 		result |= (currFigLine << 1) & currGridLine;
 		if (result)
 			break;
 	}
 	return !result;
+}
+
+int Flip(FigInfo* figInfo) {
+	FigInfo result = { 0,0,0,0,0 };			//BAD PRACTISE
+	int leftBorder = RIGHT_BORDER;
+	for (int i=0; i < FIG_SIZE; i++) {
+		if (figInfo->fig[i] == 0) continue;
+		int curLeftBorder = 0;
+		for (int j = 1;j< RIGHT_BORDER; j = j << 1) {
+			curLeftBorder = j;
+			if ((j & figInfo->fig[i])) break;
+		}
+		if (curLeftBorder < leftBorder)leftBorder = curLeftBorder;
+	}
+
+	for (int i = 0, figInfoCar=leftBorder; i < FIG_SIZE; i++, figInfoCar = figInfoCar <<1) {
+		for (int j = 0, resCar = POWERTWO(4) /*leftBorder*/; j < FIG_SIZE; j++, resCar = resCar << 1) {
+			result.fig[i] |= (figInfoCar) & (figInfo->fig[j])? resCar:0;
+		}
+		
+	}
+	for (int i = 0; i < FIG_SIZE; i++) {
+		figInfo->fig[i] = result.fig[i];
+	}
+	return 0;
 }
