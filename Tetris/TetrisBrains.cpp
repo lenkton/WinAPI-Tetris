@@ -153,17 +153,11 @@ int MoveFig(HDC hdc, int* Grid, FigInfo* figInfo, WPARAM wParam) {
 }
 
 int CheckLines(HDC hdc, int* piGrid) {
-	
-	//static const int FULL_LINE = (1 << GRID_WIDTH) - 1;
 
-	for (int i = 0; i < GRID_HEIGHT; i++) {
-		if (piGrid[i] == FULL_LINE) {
-			piGrid[i] = -1;
-		}
-	}
+	
 	int i = GRID_HEIGHT - 1, j = GRID_HEIGHT - 1;
 	for (; i > 0; i--, j--) {
-		if (piGrid[i] == -1) {
+		while (piGrid[i] == FULL_LINE) {
 			i--;
 		}
 		piGrid[j] = piGrid[i];
@@ -220,7 +214,7 @@ int Flip(FigInfo* figInfo) {
 	}
 
 	for (int i = 0, figInfoCar=leftBorder; i < FIG_SIZE; i++, figInfoCar = figInfoCar <<1) {
-		for (int j = 0, resCar = POWERTWO(4) /*leftBorder*/; j < FIG_SIZE; j++, resCar = resCar << 1) {
+		for (int j = 0, resCar = leftBorder /*leftBorder*/; j < FIG_SIZE; j++, resCar = resCar << 1) {
 			result.fig[i] |= (figInfoCar) & (figInfo->fig[j])? resCar:0;
 		}
 		
